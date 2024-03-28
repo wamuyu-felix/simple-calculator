@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <title>Calculator</title>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        #container {
+            max-width: 50rem;
+            margin: 2rem auto;
+        }
+
+        #calculator {
+            width: 25rem;
+            background-color: #07393C;
+            padding: 1rem 1rem;
+            border-radius: .25rem;
+        }
+
+        #top {
+            background-color: #063437;
+        }
+
+        #header {
+            /* border: 1px solid blue; */
+            padding: .5rem 1rem;
+        }
+
+        #header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #7CFFC4;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #output {
+            height: 10rem;
+            background-color: #063437;
+            overflow-y: hidden;
+        }
+
+        #output input {
+            background-color: #063437;
+            height: 8rem;
+            width: 100%;
+            border: none;
+            outline: none;
+            color: #EDF5FC;
+            padding: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        #output #answer {
+            color: #EDF5FC;
+            font-size: 1rem;
+            text-align: right;
+        }
+
+        #output input:focus {
+            outline: none;
+        }
+
+        #input {
+            /* border: 2px solid red; */
+            display: flex;
+            flex-direction: column;
+        }
+
+        #input .row,
+        .top-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        #input .row div,
+        .top-panel div {
+            height: 1.5rem;
+            border-right: 1px solid #0A565C;
+            border-bottom: 1px solid #0A565C;
+            padding: 2.5rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #EDF5FC;
+        }
+
+        #input .row div:last-child {
+            border-right: none;
+        }
+
+        #input .row:last-child div {
+            border-bottom: none;
+        }
+
+        #input .row .operation {
+            color: #7CFFC4;
+        }
+
+        #input .row .operation button {
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.25rem;
+            background-color: #0093E9;
+            background-image: linear-gradient(160deg, #7CFFC4 0%, #80D0C7 100%);
+            font-weight: 500;
+            cursor: pointer;
+            color: #0A565C;
+            font-size: 1.5rem;
+        }
+
+        #input .row .operation.clear {
+            color: #E5625E;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="calculator">
+            <div id="top">
+                <header id="header">
+                    <h4>Calculator</h4>
+                </header>
+                <div id="output">
+                    <input type="text" readonly>
+                    <p id="answer">
+
+                    </p>
+                </div>
+            </div>
+            <div id="input">
+                <div class="row">
+                    <div class="operation clear" data-operator="del">del</div>
+                    <div class="operation" data-operator="%">%</div>
+                    <div class="operation" data-operator="/">/</div>
+                    <div class="operation clear" data-operator="c">c</div>
+                </div>
+                <div class="row">
+                    <div data-value="1">1</div>
+                    <div data-value="2">2</div>
+                    <div data-value="3">3</div>
+                    <div class=" operation" data-operator="x">x</div>
+                </div>
+                <div class="row">
+                    <div data-value="4">4</div>
+                    <div data-value="5">5</div>
+                    <div data-value="6">6</div>
+                    <div class=" operation" data-operator="+">+</div>
+                </div>
+                <div class="row">
+                    <div data-value="7">7</div>
+                    <div data-value="8">8</div>
+                    <div data-value="9">9</div>
+                    <div class=" operation" data-operator="-">-</div>
+                </div>
+                <div class="row">
+                    <div data-value=".">.</div>
+                    <div data-value="0">0</div>
+                    <div data-value="000">000</div>
+                    <div class=" operation" data-operator="=">
+                        <button id="equals" data-operator="=">
+                            =
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const numberInputs = document.querySelectorAll(".row > div[data-value]");
+        const outputScreen = document.querySelector('#output input');
+        const operators = ['/', 'x', '%', '+', '-'];
+        const operationInputs = document.querySelectorAll('.row > div[data-operator]');
+        const answerOutput = document.getElementById('answer');
+
+        // Event listeners for number buttons
+        numberInputs.forEach(input => {
+            input.addEventListener('click', handleNumberInput);
+        });
+
+        // Event listeners for operation buttons
+        operationInputs.forEach(operation => {
+            operation.addEventListener('click', handleOperationInput);
+        });
+
+        function handleNumberInput(event) {
+            const value = event.target.getAttribute('data-value');
+            appendToOutput(value);
+        }
+
+        function handleOperationInput(event) {
+            const operator = event.target.getAttribute('data-operator');
+            if (operator === '=')
+                calculateResult();
+            else if (operator === 'c')
+                clearOutput();
+            else
+                appendToOutput(operator);
+        }
+
+        function appendToOutput(value) {
+            const currentInput = outputScreen.value;
+            outputScreen.value = currentInput + value;
+        }
+
+        function clearOutput() {
+            outputScreen.value = '';
+            answerOutput.textContent = '';
+        }
+
+        function calculateResult() {
+            try {
+                const result = evaluateExpression(outputScreen.value);
+                answerOutput.textContent = result;
+            } catch (error) {
+                console.error('Error:', error.message);
+                answerOutput.textContent = 'Error';
+            }
+        }
+
+        function evaluateExpression(expression) {
+            const sanitizedExpression = expression.replace(/x/g, '*');
+            const result = eval(sanitizedExpression);
+            if (!isFinite(result)) {
+                throw new Error('Division by zero or invalid expression');
+            }
+            return result;
+        }
+    });
+</script>
+
+</html>
